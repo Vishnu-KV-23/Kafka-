@@ -1,5 +1,5 @@
 import socket  # noqa: F401
-
+import struct
 
 def main():
     # You can use print statements as follows for debugging,
@@ -9,7 +9,19 @@ def main():
     # Uncomment this to pass the first stage
     #
     server = socket.create_server(("localhost", 9092), reuse_port=True)
-    server.accept() # wait for client
+    connection,address= server.accept() # wait for client
+    print("Connection object",connection)
+    print("Address:ip address and port",address)
+    #LEVEL 2
+    correlationId = 7
+    messageSize = 0
+
+
+    connection.recv(1024)
+    print("Recieved request")
+    response=struct.pack(">ii",messageSize,correlationId)
+    print(f"response sent:{response}")
+    connection.sendall(response)
 
 
 if __name__ == "__main__":
