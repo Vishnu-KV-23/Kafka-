@@ -22,6 +22,7 @@ def main():
     response=struct.pack(">ii",messageSize,correlationId)
     print(f"response sent:{response}")
     connection.sendall(response)
+    print("response sent")
 
 
 if __name__ == "__main__":
