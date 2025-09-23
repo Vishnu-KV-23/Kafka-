@@ -14,7 +14,7 @@ def main():
     print("Address:ip address and port",address)
     #LEVEL 2
     correlationId = 7
-    messageSize = 0
+    messageSize = 4
 
 
     connection.recv(1024)
