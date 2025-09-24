@@ -35,13 +35,28 @@ def main():
     #   correlationId = 7 → 00 00 00 07
     # Together: 00 00 00 00 00 00 00 07
 
-    correlationId = 7
+
     messageSize = 4
 
     #after waiting for connection the connection is recieved used .recv function
     message=connection.recv(1024)
-    print("Recieved request")
+    print("Recieved request:",message)
+    # the request recieved has a header format of
 
+    #HEADER FORMAT
+    # message length-4 bytes
+    # apiKey-2 bytes
+    # apiVersion- 2 bytes
+    # correlationId-4 bytes
+    # clientId-variable string
+
+    #so inorder to get correlation id, we have to convert 8th byte to 12th byte from binary to integer...
+    # we use struct.unpack for that... >i means ,>-big endian and i means 32 bit integer...
+    #struct.unpack always give output as a tuple.. even if there is only one output..(corrId,) form... because usually there is more than one op.. like struct.unpack(">ii", b'\x00\x00\x00\x04\x00\x00\x00\x07') would give (4, 7)
+
+
+    correlationId=struct.unpack(">i",message[8:12])[0]
+    print(f"correlationId:{correlationId}")
     response=struct.pack(">ii",messageSize,correlationId)
     print(f"response sent:{response}")
     connection.sendall(response)
