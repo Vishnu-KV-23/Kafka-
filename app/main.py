@@ -5,9 +5,13 @@ def main():
     # You can use print statements as follows for debugging,
     # they'll be visible when running tests.
     print("Logs from your program will appear here!")
+'''
+    As a reminder, requests and responses both have the following format:
 
-    # Uncomment this to pass the first stage
-    #
+    1.message_size
+    2.Header
+    3.Body
+'''
     server = socket.create_server(("localhost", 9092), reuse_port=True)
     connection,address= server.accept() # wait for client
     print("Connection object",connection)
