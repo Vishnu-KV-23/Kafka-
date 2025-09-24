@@ -5,13 +5,13 @@ def main():
     # You can use print statements as follows for debugging,
     # they'll be visible when running tests.
     print("Logs from your program will appear here!")
-'''
+    '''
     As a reminder, requests and responses both have the following format:
 
     1.message_size
     2.Header
     3.Body
-'''
+    '''
     server = socket.create_server(("localhost", 9092), reuse_port=True)
     connection,address= server.accept() # wait for client
     print("Connection object",connection)
@@ -40,7 +40,7 @@ def main():
     # Together: 00 00 00 00 00 00 00 07
 
 
-    messageSize = 4
+    messageSize = 6 #correlationId(4)+apiVersion(2)
 
     #after waiting for connection the connection is recieved used .recv function
     message=connection.recv(1024)
@@ -48,7 +48,7 @@ def main():
     # the request recieved has a header format of
 
     #HEADER FORMAT
-    # message length-4 bytes
+    # message length-x bytes(depends on what all are added in the header
     # apiKey-2 bytes
     # apiVersion- 2 bytes
     # correlationId-4 bytes
@@ -60,8 +60,16 @@ def main():
 
 
     correlationId=struct.unpack(">i",message[8:12])[0]
+    requestApiVersion=struct.unpack(">h",message[6:8])[0]
+    if(requestApiVersion>4):
+        errorCode=35
+    else:
+        errorCode=0
+
+    print(f"request API version:{requestApiVersion}")
     print(f"correlationId:{correlationId}")
-    response=struct.pack(">ii",messageSize,correlationId)
+    print(f"errorCode:{errorCode}")
+    response=struct.pack(">iih",messageSize,correlationId,errorCode)
     print(f"response sent:{response}")
     connection.sendall(response)
     print("response sent")
