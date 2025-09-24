@@ -39,7 +39,7 @@ def main():
     messageSize = 4
 
     #after waiting for connection the connection is recieved used .recv function
-    connection.recv(1024)
+    message=connection.recv(1024)
     print("Recieved request")
 
     response=struct.pack(">ii",messageSize,correlationId)
