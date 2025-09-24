@@ -40,8 +40,6 @@ def main():
     # Together: 00 00 00 00 00 00 00 07
 
 
-    messageSize = 6 #correlationId(4)+apiVersion(2)
-
     #after waiting for connection the connection is recieved used .recv function
     message=connection.recv(1024)
     print("Recieved request:",message)
@@ -60,16 +58,41 @@ def main():
 
 
     correlationId=struct.unpack(">i",message[8:12])[0]
+    #>h means big endian and 2 byte integer-short
     requestApiVersion=struct.unpack(">h",message[6:8])[0]
     if(requestApiVersion>4):
         errorCode=35
     else:
         errorCode=0
+    apiKey=18
+    maxApiVersion=4
+    minApiVersion=0
+    numEntries=1
+    apiKeysLength=(numEntries+1)
+
+
 
     print(f"request API version:{requestApiVersion}")
     print(f"correlationId:{correlationId}")
     print(f"errorCode:{errorCode}")
-    response=struct.pack(">iih",messageSize,correlationId,errorCode)
+
+    # FIXED: correct message size = correlationId(4) + errorCode(2) + apiKeysLength(1) +
+    #         apiKey(2) + min(2) + max(2) + entry_tag(1) + throttle_time(4) + final_tag(1)
+    messageSize = 19
+
+    # FIXED: added throttle_time_ms (i) and final_tag (b) in the struct
+    response = struct.pack(">iihbhhhibb",
+                           messageSize,
+                           correlationId,
+                           errorCode,
+                           apiKeysLength,
+                           apiKey,
+                           minApiVersion,
+                           maxApiVersion,
+                           0,#tag buffer
+                           0,#throttle time
+                           0)#tag buffer
+
     print(f"response sent:{response}")
     connection.sendall(response)
     print("response sent")
